@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+- Android default is icon badge only (no shade notification), matching iOS. Pixel dots stay opt-in via `useNotification: true`
+- Fix Android badges never applying: invalid launcher icon as notification `smallIcon`, `IMPORTANCE_MIN` hiding Pixel dots, and notification failures blocking OEM launcher APIs
+- Recreate the badge notification channel, add a white notification icon, Android 11 `<queries>`, and explicit launcher broadcasts
+
 ## 1.0.0
 
 - First public release as `react-native-notification-badge-manager`

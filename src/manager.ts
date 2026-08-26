@@ -92,8 +92,9 @@ export const NotificationBadgeManager = {
   },
 
   /**
-   * Optional Android configuration (notification channel title/body,
-   * whether to use a silent notification for stock Android badges).
+   * Optional Android configuration. By default no shade notification is posted;
+   * the icon badge is set via launcher APIs (iOS-style). Set
+   * `android.useNotification: true` only if you want Pixel notification dots.
    */
   async configure(options: ConfigureOptions): Promise<void> {
     await getNative().configure(options ?? {});

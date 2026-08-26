@@ -1,6 +1,6 @@
 {
   "name": "react-native-notification-badge-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Set, get, and clear the app icon notification badge on iOS and Android, including major OEM launchers.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

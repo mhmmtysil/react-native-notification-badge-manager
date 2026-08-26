@@ -17,7 +17,8 @@ React Native’de iOS ve Android **uygulama ikonu bildirim rozetini** ayarlayın
 - iOS rozet izni (`UserNotifications`)
 - Android 13+ `POST_NOTIFICATIONS` izni
 - `useNotificationBadge()` React hook’u
-- Stok Android rozetleri için sessiz bildirim
+- Samsung, Xiaomi, Huawei, OPPO, vivo ve diğer OEM launcher’larda ikon rozeti (bildirim tepsisi yok)
+- Pixel/AOSP için isteğe bağlı notification-dot: `configure({ android: { useNotification: true } })`
 - OEM launcher rozetleri: Samsung, Huawei, Honor, Xiaomi, OPPO, vivo, Sony, HTC, Asus, Nova, Apex, ZTE
 - Android bildirim kanalı başlık/gövde ayarı
 - Apple privacy manifest
@@ -99,7 +100,9 @@ function UnreadBadgeButton() {
 
 ### Android seçenekleri
 
-Stok Android (Pixel / AOSP) launcher rozetini bildirimlerden gösterir. Kütüphane bunun için sessiz, düşük öncelikli bir bildirim gönderir. OEM launcher’lar (Samsung, Xiaomi, …) kendi rozet API’lerini de alır.
+Varsayılan davranış iOS ile aynı: **yalnızca uygulama ikonu rozeti**, bildirim tepsisinde öğe yok. Samsung, Xiaomi, Huawei, OPPO, vivo gibi üretici launcher API’leri kullanılır.
+
+Stok Android (Pixel / AOSP) bildirim olmadan ikonda sayı göstermez; böyle bir genel API yok. Orada nokta istiyorsanız açıkça açın:
 
 ```ts
 await NotificationBadgeManager.configure({
@@ -112,7 +115,7 @@ await NotificationBadgeManager.configure({
 });
 ```
 
-Yalnızca OEM launcher yayınları istiyorsanız ve sessiz bildirim istemiyorsanız `useNotification: false` verin.
+Bildirim tepsisinde hiçbir şey görünmesini istemiyorsanız `useNotification` vermeyin (veya `false` bırakın).
 
 ### Push bildirimleriyle
 
@@ -158,10 +161,12 @@ iOS’ta APNs gövdesi `"badge": 3` ile rozeti de ayarlayabilir. Bu paket aynı 
 
 Launcher rozetleri tek bir genel Android API’si **değildir**. Bu kütüphane:
 
-1. Pixel / AOSP için `setNumber(count)` ile sessiz bir bildirim gönderir
-2. Popüler launcher’lar için üretici rozet API’lerini / yayınlarını çağırır
+1. **İkon rozet sayısını** üretici launcher API’leriyle yazar (Samsung, Huawei, Honor, Xiaomi, OPPO, vivo, Sony, …) — bildirim tepsisi yok
+2. Pixel / AOSP noktası için yalnızca `useNotification: true` derseniz bildirim gönderir
 
-Bazı launcher’lar sistem ayarlarında rozet açılmadan sayıyı göstermez. Özellikle Xiaomi/HyperOS uygulamaya rozet izni ister.
+Kurulum veya güncellemeden sonra native uygulamayı yeniden derleyin (`npx react-native run-android` veya `npx expo run:android`).
+
+Bazı launcher’lar sistem ayarlarında rozet açılmadan sayıyı göstermez. Özellikle Xiaomi/HyperOS uygulamaya rozet izni ister. Pixel, bildirim olmadan iOS tarzı sayı gösteremez; bu bir işletim sistemi sınırıdır.
 
 Android’de `getCount()` sistemden okumaz; bu kütüphanenin en son yazdığı değeri döner (`SharedPreferences`).
 

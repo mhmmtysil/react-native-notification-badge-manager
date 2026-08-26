@@ -3,6 +3,8 @@ package com.notificationbadgemanager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -10,6 +12,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -109,12 +112,20 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
   private fun applyBadge(rawCount: Int): Int {
     val count = max(0, rawCount)
     writeStoredCount(count)
-    if (prefs().getBoolean(KEY_USE_NOTIFICATION, true)) {
-      applyNotificationBadge(count)
-    } else if (count <= 0) {
-      NotificationManagerCompat.from(reactContext).cancel(BADGE_NOTIFICATION_ID)
+    try {
+      if (prefs().getBoolean(KEY_USE_NOTIFICATION, false)) {
+        applyNotificationBadge(count)
+      } else {
+        NotificationManagerCompat.from(reactContext).cancel(BADGE_NOTIFICATION_ID)
+      }
+    } catch (e: Exception) {
+      Log.w(TAG, "Notification badge failed", e)
     }
-    applyLauncherBadges(count)
+    try {
+      applyLauncherBadges(count)
+    } catch (e: Exception) {
+      Log.w(TAG, "Launcher badge failed", e)
+    }
     return count
   }
 
@@ -127,13 +138,13 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
       return
     }
 
-    if (!hasNotificationPermission()) {
+    if (!hasNotificationPermission() || !manager.areNotificationsEnabled()) {
+      Log.w(TAG, "POST_NOTIFICATIONS is not granted; Pixel/AOSP badges will not show")
       return
     }
 
-    val appInfo = reactContext.applicationInfo
-    val appName = reactContext.packageManager.getApplicationLabel(appInfo).toString()
-    val icon = if (appInfo.icon != 0) appInfo.icon else android.R.drawable.sym_def_app_icon
+    val appName =
+        reactContext.packageManager.getApplicationLabel(reactContext.applicationInfo).toString()
     val title =
         (prefs().getString(KEY_CONTENT_TITLE, null)?.ifBlank { null } ?: appName).replace(
             "%count%",
@@ -144,17 +155,21 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
 
     val builder =
         NotificationCompat.Builder(reactContext, CHANNEL_ID)
-            .setSmallIcon(icon)
+            .setSmallIcon(smallIcon())
             .setContentTitle(title)
             .setContentText(text)
             .setNumber(count)
             .setBadgeIconType(NotificationCompat.BADGE_ICON_SMALL)
-            .setSilent(true)
             .setAutoCancel(false)
             .setOngoing(false)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOnlyAlertOnce(true)
+            .setDefaults(0)
+            .setSound(null)
+            .setVibrate(null)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentIntent(launchPendingIntent())
 
     val notification = builder.build()
     applyXiaomiCount(notification, count)
@@ -168,16 +183,44 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
         reactContext.packageManager.getApplicationLabel(reactContext.applicationInfo).toString()
     val channelName = prefs().getString(KEY_CHANNEL_NAME, null)?.ifBlank { null } ?: appName
     val existing = nm.getNotificationChannel(CHANNEL_ID)
-    if (existing != null && existing.name == channelName) return
+    if (existing != null &&
+        (existing.importance < NotificationManager.IMPORTANCE_DEFAULT || !existing.canShowBadge())) {
+      nm.deleteNotificationChannel(CHANNEL_ID)
+    } else if (existing != null && existing.name == channelName) {
+      return
+    }
 
     val channel =
-        NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_MIN).apply {
-          setShowBadge(true)
-          enableLights(false)
-          enableVibration(false)
-          setSound(null, null)
-        }
+        NotificationChannel(CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+            .apply {
+              setShowBadge(true)
+              enableLights(false)
+              enableVibration(false)
+              setSound(null, null)
+              description = "App icon badge"
+            }
     nm.createNotificationChannel(channel)
+  }
+
+  private fun smallIcon(): Int {
+    val pkg = reactContext.packageName
+    val res = reactContext.resources
+    for (name in arrayOf("ic_notification", "notification_icon", "ic_stat_notify")) {
+      val drawableId = res.getIdentifier(name, "drawable", pkg)
+      if (drawableId != 0) return drawableId
+    }
+    return R.drawable.notification_badge_icon
+  }
+
+  private fun launchPendingIntent(): PendingIntent? {
+    val launch = reactContext.packageManager.getLaunchIntentForPackage(reactContext.packageName)
+        ?: return null
+    launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    var flags = PendingIntent.FLAG_UPDATE_CURRENT
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      flags = flags or PendingIntent.FLAG_IMMUTABLE
+    }
+    return PendingIntent.getActivity(reactContext, 0, launch, flags)
   }
 
   private fun applyXiaomiCount(notification: Notification, count: Int) {
@@ -228,8 +271,14 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
             put("class", className)
             put("badgecount", count)
           }
-      reactContext.contentResolver.insert(Uri.parse(SAMSUNG_BADGE_URI), values)
-    } catch (_: Exception) {
+      val uri = Uri.parse(SAMSUNG_BADGE_URI)
+      val updated =
+          reactContext.contentResolver.update(uri, values, "package=?", arrayOf(packageName))
+      if (updated == 0) {
+        reactContext.contentResolver.insert(uri, values)
+      }
+    } catch (e: Exception) {
+      Log.d(TAG, "Samsung badge not available", e)
     }
   }
 
@@ -275,13 +324,16 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
   }
 
   private fun applyVivoBadge(packageName: String, className: String, count: Int) {
-    sendBroadcast(
-        Intent("launcher.action.CHANGE_APPLICATION_NOTIFICATION_NUM").apply {
-          putExtra("packageName", packageName)
-          putExtra("className", className)
-          putExtra("notificationNum", count)
-        }
-    )
+    for (launcher in arrayOf("com.vivo.launcher", "com.bbk.launcher2")) {
+      sendBroadcast(
+          Intent("launcher.action.CHANGE_APPLICATION_NOTIFICATION_NUM").apply {
+            setPackage(launcher)
+            putExtra("packageName", packageName)
+            putExtra("className", className)
+            putExtra("notificationNum", count)
+          }
+      )
+    }
   }
 
   private fun applyHtcBadge(component: String, packageName: String, count: Int) {
@@ -322,7 +374,7 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
   }
 
   private fun applyXiaomiBroadcast(packageName: String, className: String, count: Int) {
-    sendBroadcast(
+    val intent =
         Intent("android.intent.action.APPLICATION_MESSAGE_UPDATE").apply {
           putExtra(
               "android.intent.extra.update_application_component_name",
@@ -333,7 +385,10 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
               if (count == 0) "" else count.toString(),
           )
         }
-    )
+    sendBroadcast(intent)
+    for (launcher in arrayOf("com.miui.home", "com.mi.android.globallauncher")) {
+      sendBroadcast(Intent(intent).setPackage(launcher))
+    }
   }
 
   private fun applyZteBadge(component: String, count: Int) {
@@ -361,18 +416,47 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
 
   private fun sendBroadcast(intent: Intent) {
     try {
-      reactContext.sendBroadcast(intent)
-    } catch (_: Exception) {
+      val pm = reactContext.packageManager
+      val receivers =
+          if (Build.VERSION.SDK_INT >= 33) {
+            pm.queryBroadcastReceivers(intent, PackageManager.ResolveInfoFlags.of(0))
+          } else {
+            @Suppress("DEPRECATION") pm.queryBroadcastReceivers(intent, 0)
+          }
+      if (receivers.isEmpty()) {
+        reactContext.sendBroadcast(intent)
+        return
+      }
+      for (info in receivers) {
+        val targeted = Intent(intent)
+        targeted.component =
+            ComponentName(info.activityInfo.packageName, info.activityInfo.name)
+        reactContext.sendBroadcast(targeted)
+      }
+    } catch (e: Exception) {
+      Log.d(TAG, "Badge broadcast failed for ${intent.action}", e)
     }
   }
 
   private fun launcherClassName(): String? {
+    val launch = reactContext.packageManager.getLaunchIntentForPackage(reactContext.packageName)
+    launch?.component?.className?.let {
+      return it
+    }
     val intent =
         Intent(Intent.ACTION_MAIN).apply {
           addCategory(Intent.CATEGORY_LAUNCHER)
           setPackage(reactContext.packageName)
         }
-    val resolved = reactContext.packageManager.queryIntentActivities(intent, 0)
+    val resolved =
+        if (Build.VERSION.SDK_INT >= 33) {
+          reactContext.packageManager.queryIntentActivities(
+              intent,
+              PackageManager.ResolveInfoFlags.of(0),
+          )
+        } else {
+          @Suppress("DEPRECATION") reactContext.packageManager.queryIntentActivities(intent, 0)
+        }
     return resolved.firstOrNull()?.activityInfo?.name
   }
 
@@ -400,6 +484,7 @@ class NotificationBadgeManagerModule(private val reactContext: ReactApplicationC
 
   companion object {
     const val NAME = "NotificationBadgeManager"
+    private const val TAG = "NotificationBadgeManager"
     private const val PREFS_NAME = "rn.notification.badge.manager"
     private const val KEY_COUNT = "badge_count"
     private const val KEY_USE_NOTIFICATION = "use_notification"

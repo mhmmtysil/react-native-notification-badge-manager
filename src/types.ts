@@ -2,8 +2,8 @@ export type BadgePermissionStatus = 'granted' | 'denied' | 'undetermined';
 
 export type AndroidBadgeOptions = {
   /**
-   * Show a silent notification so stock Android (Pixel, AOSP) can display a
-   * launcher badge. Default: `true`.
+   * Post a notification so Pixel / AOSP can show a launcher dot.
+   * Default: `false` — icon badge only (Samsung, Xiaomi, Huawei, …), no shade notification.
    */
   useNotification?: boolean;
   /** Notification channel name shown in system settings. */

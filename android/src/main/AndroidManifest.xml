@@ -17,4 +17,44 @@
   <uses-permission android:name="com.vivo.notification.permission.BADGE_ICON" />
   <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_READ" />
   <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_WRITE" />
+
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+      <category android:name="android.intent.category.HOME" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.BADGE_COUNT_UPDATE" />
+    </intent>
+    <intent>
+      <action android:name="com.sonyericsson.home.action.UPDATE_BADGE" />
+    </intent>
+    <intent>
+      <action android:name="launcher.action.CHANGE_APPLICATION_NOTIFICATION_NUM" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.APPLICATION_MESSAGE_UPDATE" />
+    </intent>
+    <intent>
+      <action android:name="com.htc.launcher.action.SET_NOTIFICATION" />
+    </intent>
+    <intent>
+      <action android:name="com.anddoes.launcher.COUNTER_CHANGED" />
+    </intent>
+    <package android:name="com.sec.android.app.launcher" />
+    <package android:name="com.huawei.android.launcher" />
+    <package android:name="com.hihonor.android.launcher" />
+    <package android:name="com.miui.home" />
+    <package android:name="com.mi.android.globallauncher" />
+    <package android:name="com.oppo.launcher" />
+    <package android:name="com.android.launcher" />
+    <package android:name="com.vivo.launcher" />
+    <package android:name="com.bbk.launcher2" />
+    <package android:name="com.asus.launcher" />
+    <provider android:authorities="com.sec.badge" />
+    <provider android:authorities="com.huawei.android.launcher.settings" />
+    <provider android:authorities="com.hihonor.android.launcher.settings" />
+    <provider android:authorities="com.android.badge" />
+    <provider android:authorities="com.teslacoilsw.notifier" />
+  </queries>
 </manifest>

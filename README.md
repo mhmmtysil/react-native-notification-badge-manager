@@ -17,7 +17,8 @@ Requires **React Native 0.73 or later**. Works with autolinking, TypeScript, Exp
 - iOS badge permission request (`UserNotifications`)
 - Android 13+ `POST_NOTIFICATIONS` request
 - `useNotificationBadge()` React hook
-- Stock Android badges via a silent notification
+- Icon badge on Samsung, Xiaomi, Huawei, OPPO, vivo, and other OEM launchers (no shade notification)
+- Optional Pixel/AOSP notification-dot mode via `configure({ android: { useNotification: true } })`
 - OEM launcher badges: Samsung, Huawei, Honor, Xiaomi, OPPO, vivo, Sony, HTC, Asus, Nova, Apex, ZTE
 - Configurable Android notification channel title/body
 - Apple privacy manifest included
@@ -99,7 +100,9 @@ function UnreadBadgeButton() {
 
 ### Android options
 
-Stock Android (Pixel / AOSP) shows launcher badges from notifications. The library posts a silent, low-importance notification for that. OEM launchers (Samsung, Xiaomi, …) also receive their own badge APIs.
+By default Android behaves like iOS: **only the app-icon badge**, no item in the notification shade. That uses manufacturer launcher APIs (Samsung, Xiaomi, Huawei, OPPO, vivo, …).
+
+Stock Android (Pixel / AOSP) has **no public API** for a numeric icon badge without a notification. If you need a launcher dot there, opt in:
 
 ```ts
 await NotificationBadgeManager.configure({
@@ -112,7 +115,7 @@ await NotificationBadgeManager.configure({
 });
 ```
 
-Set `useNotification: false` if you only want OEM launcher broadcasts and do not want a silent notification.
+Leave `useNotification` unset (or `false`) if you do not want anything in the notification shade.
 
 ### With push notifications
 
@@ -158,10 +161,12 @@ Named export `BadgeManager` is an alias of `NotificationBadgeManager`.
 
 Launcher badges are **not** a single public Android API. This library:
 
-1. Posts a silent notification with `setNumber(count)` for Pixel / AOSP
-2. Calls manufacturer badge APIs / broadcasts for popular launchers
+1. Sets the **icon badge number** through manufacturer launcher APIs (Samsung, Huawei, Honor, Xiaomi, OPPO, vivo, Sony, …) — no shade notification
+2. Optionally posts a notification for Pixel / AOSP dots if you set `useNotification: true`
 
-Some launchers ignore badges unless the user enables them in system settings. Xiaomi/HyperOS in particular often requires badge permission for the app.
+Rebuild the native app after installing or upgrading (`npx react-native run-android` or `npx expo run:android`).
+
+Some launchers ignore badges unless the user enables them in system settings. Xiaomi/HyperOS in particular often requires badge permission for the app. Pixel cannot show an iOS-style number on the icon without a notification; that is an OS limit.
 
 `getCount()` on Android returns the last value written by this library (stored in `SharedPreferences`), not a system-wide query.
 
