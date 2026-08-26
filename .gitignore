@@ -1,0 +1,38 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tgz
+package-lock.json.bak
+
+# Build
+lib/
+android/build/
+android/.gradle/
+android/local.properties
+android/.cxx/
+ios/build/
+ios/Pods/
+ios/DerivedData/
+*.xcuserstate
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Expo
+.expo/
+.expo-shared/
+
+# Misc
+coverage/
+.env
+.env.*

@@ -3,8 +3,11 @@ module.exports = {
     platforms: {
       android: {
         sourceDir: './android',
-        packageImportPath: 'import com.reactnativebadgemanager.BadgeManagerPackage;',
-        packageInstance: 'new BadgeManagerPackage()',
+        packageImportPath: 'import com.notificationbadgemanager.NotificationBadgeManagerPackage;',
+        packageInstance: 'new NotificationBadgeManagerPackage()',
+      },
+      ios: {
+        podspecPath: './react-native-notification-badge-manager.podspec',
       },
     },
   },

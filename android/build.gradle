@@ -1,6 +1,6 @@
 buildscript {
   ext.getExtOrDefault = { name ->
-    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["BadgeManager_" + name]
+    return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["NotificationBadgeManager_" + name]
   }
 
   repositories {
@@ -15,14 +15,14 @@ buildscript {
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["BadgeManager_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["NotificationBadgeManager_" + name]).toInteger()
 }
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-  namespace "com.reactnativebadgemanager"
+  namespace "com.notificationbadgemanager"
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 

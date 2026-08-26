@@ -1,15 +1,95 @@
 {
-  "name": "react-native-badge-manager",
+  "name": "react-native-notification-badge-manager",
   "version": "1.0.0",
-  "description": "Set and clear the app icon badge count on iOS and Android",
-  "main": "src/index.ts",
+  "description": "Set, get, and clear the app icon notification badge on iOS and Android, including major OEM launchers.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "react-native": "src/index.ts",
-  "types": "src/index.ts",
-  "keywords": ["react-native", "badge", "ios", "android"],
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.ts",
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./app.plugin.js": "./app.plugin.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "app.plugin.js",
+    "react-native.config.js",
+    "react-native-notification-badge-manager.podspec",
+    "LICENSE",
+    "README.md",
+    "README.tr.md",
+    "CHANGELOG.md",
+    "!android/build",
+    "!android/.gradle",
+    "!android/local.properties",
+    "!ios/build",
+    "!**/.*"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "tsc -p tsconfig.build.json",
+    "prepack": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+  },
+  "keywords": [
+    "react-native",
+    "badge",
+    "notification",
+    "app-icon",
+    "unread",
+    "ios",
+    "android",
+    "samsung",
+    "xiaomi",
+    "huawei",
+    "oppo",
+    "vivo",
+    "expo",
+    "push-notification"
+  ],
   "license": "MIT",
-  "author": "FitnessPass",
+  "author": {
+    "name": "Muhammet Yesil",
+    "email": "muhammetyesil@outlook.com.tr",
+    "url": "https://github.com/mhmmtysil"
+  },
+  "homepage": "https://github.com/mhmmtysil/react-native-notification-badge-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mhmmtysil/react-native-notification-badge-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mhmmtysil/react-native-notification-badge-manager/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": ">=0.73.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.8.0"
+  },
+  "codegenConfig": {
+    "name": "RNNotificationBadgeManagerSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.notificationbadgemanager"
+    }
   }
 }

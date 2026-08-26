@@ -1,41 +1,12 @@
-import { NativeModules } from 'react-native';
+export { BadgeManager, NotificationBadgeManager } from './manager';
+export { useNotificationBadge } from './useNotificationBadge';
+export type { UseNotificationBadgeResult } from './useNotificationBadge';
+export type {
+  AndroidBadgeOptions,
+  BadgePermissionStatus,
+  ConfigureOptions,
+} from './types';
 
-type BadgeManagerNativeModule = {
-  setBadgeCount(count: number): Promise<void>;
-  clearBadge(): Promise<void>;
-};
+import { NotificationBadgeManager } from './manager';
 
-const nativeModule = NativeModules.BadgeManager as
-  | BadgeManagerNativeModule
-  | undefined;
-
-function getNative(): BadgeManagerNativeModule | null {
-  return nativeModule ?? null;
-}
-
-function normalizeBadgeCount(count: number): number {
-  if (!Number.isFinite(count)) {
-    return 0;
-  }
-  return Math.max(0, Math.floor(count));
-}
-
-export const BadgeManager = {
-  async setBadgeCount(count: number): Promise<void> {
-    const native = getNative();
-    if (!native) {
-      return;
-    }
-    await native.setBadgeCount(normalizeBadgeCount(count));
-  },
-
-  async clearBadge(): Promise<void> {
-    const native = getNative();
-    if (!native) {
-      return;
-    }
-    await native.clearBadge();
-  },
-};
-
-export default BadgeManager;
+export default NotificationBadgeManager;
