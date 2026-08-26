@@ -82,8 +82,6 @@ await NotificationBadgeManager.decrement(2);
 await NotificationBadgeManager.clear();
 ```
 
-![setCount(5) iOS ve Android uygulama ikonundaki rozeti günceller](./docs/badge-example.png)
-
 ### React hook
 
 ```tsx

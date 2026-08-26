@@ -82,8 +82,6 @@ await NotificationBadgeManager.decrement(2);
 await NotificationBadgeManager.clear();
 ```
 
-![setCount(5) updates the app icon badge on iOS and Android](./docs/badge-example.png)
-
 ### React hook
 
 ```tsx
