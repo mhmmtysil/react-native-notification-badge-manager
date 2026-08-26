@@ -2,15 +2,13 @@
 
 [English](README.md) | [Türkçe](README.tr.md)
 
+![React Native Notification Badge Manager](./docs/banner.png)
+
 React Native’de iOS ve Android **uygulama ikonu bildirim rozetini** ayarlayın, okuyun ve temizleyin.
 
 **React Native 0.73 veya üzeri** gerekir. Autolinking, TypeScript, Expo development build ve hem eski hem yeni React Native mimarisi ile çalışır (eski native modül + New Architecture interop).
 
 [![npm version](https://img.shields.io/npm/v/react-native-notification-badge-manager.svg)](https://www.npmjs.com/package/react-native-notification-badge-manager)
-
-![setCount(5) iOS ve Android uygulama ikonundaki rozeti günceller](./docs/badge-example.png)
-
-`NotificationBadgeManager.setCount(5)` → iOS ve Android ana ekran ikonunda kırmızı rozet **5**.
 
 ## Özellikler
 

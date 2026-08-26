@@ -2,15 +2,13 @@
 
 [English](README.md) | [Türkçe](README.tr.md)
 
+![React Native Notification Badge Manager](./docs/banner.png)
+
 Set, read, and clear the **app icon notification badge** on iOS and Android from React Native.
 
 Requires **React Native 0.73 or later**. Works with autolinking, TypeScript, Expo development builds, and both the old and new React Native architectures (legacy native module + New Architecture interop).
 
 [![npm version](https://img.shields.io/npm/v/react-native-notification-badge-manager.svg)](https://www.npmjs.com/package/react-native-notification-badge-manager)
-
-![setCount(5) updates the app icon badge on iOS and Android](./docs/badge-example.png)
-
-`NotificationBadgeManager.setCount(5)` → red badge **5** on the iOS and Android home screen icons.
 
 ## Features
 
