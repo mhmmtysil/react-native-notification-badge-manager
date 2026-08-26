@@ -1,0 +1,15 @@
+{
+  "name": "react-native-badge-manager",
+  "version": "1.0.0",
+  "description": "Set and clear the app icon badge count on iOS and Android",
+  "main": "src/index.ts",
+  "react-native": "src/index.ts",
+  "types": "src/index.ts",
+  "keywords": ["react-native", "badge", "ios", "android"],
+  "license": "MIT",
+  "author": "FitnessPass",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  }
+}
