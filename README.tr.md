@@ -8,6 +8,10 @@ React Native’de iOS ve Android **uygulama ikonu bildirim rozetini** ayarlayın
 
 [![npm version](https://img.shields.io/npm/v/react-native-notification-badge-manager.svg)](https://www.npmjs.com/package/react-native-notification-badge-manager)
 
+![setCount(5) iOS ve Android uygulama ikonundaki rozeti günceller](./docs/badge-example.png)
+
+`NotificationBadgeManager.setCount(5)` → iOS ve Android ana ekran ikonunda kırmızı rozet **5**.
+
 ## Özellikler
 
 - `setCount` / `getCount` / `clear`
@@ -77,6 +81,8 @@ await NotificationBadgeManager.increment();
 await NotificationBadgeManager.decrement(2);
 await NotificationBadgeManager.clear();
 ```
+
+![setCount(5) iOS ve Android uygulama ikonundaki rozeti günceller](./docs/badge-example.png)
 
 ### React hook
 

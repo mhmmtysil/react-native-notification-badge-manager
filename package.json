@@ -27,6 +27,7 @@
     "README.md",
     "README.tr.md",
     "CHANGELOG.md",
+    "docs",
     "!android/build",
     "!android/.gradle",
     "!android/local.properties",

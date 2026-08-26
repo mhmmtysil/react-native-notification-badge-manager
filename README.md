@@ -8,6 +8,10 @@ Requires **React Native 0.73 or later**. Works with autolinking, TypeScript, Exp
 
 [![npm version](https://img.shields.io/npm/v/react-native-notification-badge-manager.svg)](https://www.npmjs.com/package/react-native-notification-badge-manager)
 
+![setCount(5) updates the app icon badge on iOS and Android](./docs/badge-example.png)
+
+`NotificationBadgeManager.setCount(5)` → red badge **5** on the iOS and Android home screen icons.
+
 ## Features
 
 - `setCount` / `getCount` / `clear`
@@ -77,6 +81,8 @@ await NotificationBadgeManager.increment();
 await NotificationBadgeManager.decrement(2);
 await NotificationBadgeManager.clear();
 ```
+
+![setCount(5) updates the app icon badge on iOS and Android](./docs/badge-example.png)
 
 ### React hook
 
